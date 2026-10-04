@@ -1,0 +1,161 @@
+2026-10-05 00:38:04
+Full thread dump Java HotSpot(TM) 64-Bit Server VM (21.0.6+8-LTS-jvmci-23.1-b55 mixed mode, sharing):
+
+Threads class SMR info:
+_java_thread_list=0x0000600002018f40, length=13, elements={
+0x000000014a00e800, 0x000000014a877400, 0x000000014a87ac00, 0x000000013a037800,
+0x000000013a038000, 0x000000014b012a00, 0x000000014a87b400, 0x000000014b00f400,
+0x000000014a8abc00, 0x000000014a86cc00, 0x000000014a86d400, 0x000000014a011200,
+0x000000013a008200
+}
+
+"Reference Handler" #9 [31747] daemon prio=10 os_prio=36 cpu=0.06ms elapsed=855.16s tid=0x000000014a00e800 nid=31747 waiting on condition  [0x000000016c9d6000]
+   java.lang.Thread.State: RUNNABLE
+	at java.lang.ref.Reference.waitForReferencePendingList(java.base@21.0.6/Native Method)
+	at java.lang.ref.Reference.processPendingReferences(java.base@21.0.6/Reference.java:246)
+	at java.lang.ref.Reference$ReferenceHandler.run(java.base@21.0.6/Reference.java:208)
+
+"Finalizer" #10 [31491] daemon prio=8 os_prio=34 cpu=0.05ms elapsed=855.16s tid=0x000000014a877400 nid=31491 in Object.wait()  [0x000000016cbe2000]
+   java.lang.Thread.State: WAITING (on object monitor)
+	at java.lang.Object.wait0(java.base@21.0.6/Native Method)
+	- waiting on <0x0000000787f023f0> (a java.lang.ref.NativeReferenceQueue$Lock)
+	at java.lang.Object.wait(java.base@21.0.6/Object.java:366)
+	at java.lang.Object.wait(java.base@21.0.6/Object.java:339)
+	at java.lang.ref.NativeReferenceQueue.await(java.base@21.0.6/NativeReferenceQueue.java:48)
+	at java.lang.ref.ReferenceQueue.remove0(java.base@21.0.6/ReferenceQueue.java:158)
+	at java.lang.ref.NativeReferenceQueue.remove(java.base@21.0.6/NativeReferenceQueue.java:89)
+	- locked <0x0000000787f023f0> (a java.lang.ref.NativeReferenceQueue$Lock)
+	at java.lang.ref.Finalizer$FinalizerThread.run(java.base@21.0.6/Finalizer.java:173)
+
+"Signal Dispatcher" #11 [30979] daemon prio=9 os_prio=35 cpu=0.54ms elapsed=855.16s tid=0x000000014a87ac00 nid=30979 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"Service Thread" #12 [22787] daemon prio=9 os_prio=31 cpu=0.13ms elapsed=855.16s tid=0x000000013a037800 nid=22787 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"Monitor Deflation Thread" #13 [30467] daemon prio=9 os_prio=31 cpu=55.63ms elapsed=855.16s tid=0x000000013a038000 nid=30467 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"JVMCI-native CompilerThread0" #14 [29955] daemon prio=9 os_prio=35 cpu=40.77ms elapsed=855.16s tid=0x000000014b012a00 nid=29955 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+"C1 CompilerThread0" #15 [29443] daemon prio=9 os_prio=35 cpu=31.10ms elapsed=855.16s tid=0x000000014a87b400 nid=29443 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+   No compile task
+
+"Common-Cleaner" #18 [23299] daemon prio=8 os_prio=34 cpu=12.46ms elapsed=855.16s tid=0x000000014b00f400 nid=23299 waiting on condition  [0x000000016dc2a000]
+   java.lang.Thread.State: TIMED_WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21.0.6/Native Method)
+	- parking to wait for  <0x0000000787f4d328> (a java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject)
+	at java.util.concurrent.locks.LockSupport.parkNanos(java.base@21.0.6/LockSupport.java:269)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(java.base@21.0.6/AbstractQueuedSynchronizer.java:1852)
+	at java.lang.ref.ReferenceQueue.await(java.base@21.0.6/ReferenceQueue.java:71)
+	at java.lang.ref.ReferenceQueue.remove0(java.base@21.0.6/ReferenceQueue.java:143)
+	at java.lang.ref.ReferenceQueue.remove(java.base@21.0.6/ReferenceQueue.java:218)
+	at jdk.internal.ref.CleanerImpl.run(java.base@21.0.6/CleanerImpl.java:140)
+	at java.lang.Thread.runWith(java.base@21.0.6/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21.0.6/Thread.java:1583)
+	at jdk.internal.misc.InnocuousThread.run(java.base@21.0.6/InnocuousThread.java:186)
+
+"Notification Thread" #19 [23555] daemon prio=9 os_prio=31 cpu=0.02ms elapsed=855.15s tid=0x000000014a8abc00 nid=23555 runnable  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"transfer-A" #20 [23811] prio=5 os_prio=31 cpu=2.65ms elapsed=855.15s tid=0x000000014a86cc00 nid=23811 waiting on condition  [0x000000016e042000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21.0.6/Native Method)
+	- parking to wait for  <0x0000000787d156e8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21.0.6/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21.0.6/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21.0.6/AbstractQueuedSynchronizer.java:990)
+	at java.util.concurrent.locks.ReentrantLock$Sync.lock(java.base@21.0.6/ReentrantLock.java:153)
+	at java.util.concurrent.locks.ReentrantLock.lock(java.base@21.0.6/ReentrantLock.java:322)
+	at org.grv.service.authpipeline.AccountLedger.transferNaive(AccountLedger.java:95)
+	at org.grv.DeadLockDemo.transferLoop(DeadLockDemo.java:23)
+	at org.grv.DeadLockDemo.lambda$main$0(DeadLockDemo.java:10)
+	at org.grv.DeadLockDemo$$Lambda/0x0000000501001220.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21.0.6/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21.0.6/Thread.java:1583)
+
+"transfer-B" #21 [28419] prio=5 os_prio=31 cpu=3.03ms elapsed=855.15s tid=0x000000014a86d400 nid=28419 waiting on condition  [0x000000016e24e000]
+   java.lang.Thread.State: WAITING (parking)
+	at jdk.internal.misc.Unsafe.park(java.base@21.0.6/Native Method)
+	- parking to wait for  <0x0000000787d15610> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21.0.6/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21.0.6/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21.0.6/AbstractQueuedSynchronizer.java:990)
+	at java.util.concurrent.locks.ReentrantLock$Sync.lock(java.base@21.0.6/ReentrantLock.java:153)
+	at java.util.concurrent.locks.ReentrantLock.lock(java.base@21.0.6/ReentrantLock.java:322)
+	at org.grv.service.authpipeline.AccountLedger.transferNaive(AccountLedger.java:95)
+	at org.grv.DeadLockDemo.transferLoop(DeadLockDemo.java:23)
+	at org.grv.DeadLockDemo.lambda$main$1(DeadLockDemo.java:11)
+	at org.grv.DeadLockDemo$$Lambda/0x0000000501001438.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21.0.6/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21.0.6/Thread.java:1583)
+
+"DestroyJavaVM" #22 [5891] prio=5 os_prio=31 cpu=32.31ms elapsed=855.15s tid=0x000000014a011200 nid=5891 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"Attach Listener" #23 [21775] daemon prio=9 os_prio=35 cpu=0.54ms elapsed=0.11s tid=0x000000013a008200 nid=21775 waiting on condition  [0x0000000000000000]
+   java.lang.Thread.State: RUNNABLE
+
+"VM Thread" os_prio=35 cpu=17.28ms elapsed=855.17s tid=0x0000000149f0aa70 nid=18947 runnable  
+
+"GC Thread#0" os_prio=35 cpu=0.02ms elapsed=855.18s tid=0x0000000139f064b0 nid=15107 runnable  
+
+"G1 Main Marker" os_prio=35 cpu=0.01ms elapsed=855.18s tid=0x0000000149f053b0 nid=14595 runnable  
+
+"G1 Conc#0" os_prio=35 cpu=0.01ms elapsed=855.18s tid=0x0000000149f05d20 nid=13315 runnable  
+
+"G1 Refine#0" os_prio=35 cpu=0.02ms elapsed=855.18s tid=0x000000014a809a00 nid=13827 runnable  
+
+"G1 Service" os_prio=35 cpu=19.39ms elapsed=855.18s tid=0x0000000149e07620 nid=16643 runnable  
+
+"VM Periodic Task Thread" os_prio=36 cpu=310.21ms elapsed=855.17s tid=0x0000000139f07310 nid=21507 waiting on condition  
+
+JNI global refs: 9, weak refs: 0
+
+
+Found one Java-level deadlock:
+=============================
+"transfer-A":
+  waiting for ownable synchronizer 0x0000000787d156e8, (a java.util.concurrent.locks.ReentrantLock$NonfairSync),
+  which is held by "transfer-B"
+
+"transfer-B":
+  waiting for ownable synchronizer 0x0000000787d15610, (a java.util.concurrent.locks.ReentrantLock$NonfairSync),
+  which is held by "transfer-A"
+
+Java stack information for the threads listed above:
+===================================================
+"transfer-A":
+	at jdk.internal.misc.Unsafe.park(java.base@21.0.6/Native Method)
+	- parking to wait for  <0x0000000787d156e8> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21.0.6/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21.0.6/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21.0.6/AbstractQueuedSynchronizer.java:990)
+	at java.util.concurrent.locks.ReentrantLock$Sync.lock(java.base@21.0.6/ReentrantLock.java:153)
+	at java.util.concurrent.locks.ReentrantLock.lock(java.base@21.0.6/ReentrantLock.java:322)
+	at org.grv.service.authpipeline.AccountLedger.transferNaive(AccountLedger.java:95)
+	at org.grv.DeadLockDemo.transferLoop(DeadLockDemo.java:23)
+	at org.grv.DeadLockDemo.lambda$main$0(DeadLockDemo.java:10)
+	at org.grv.DeadLockDemo$$Lambda/0x0000000501001220.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21.0.6/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21.0.6/Thread.java:1583)
+"transfer-B":
+	at jdk.internal.misc.Unsafe.park(java.base@21.0.6/Native Method)
+	- parking to wait for  <0x0000000787d15610> (a java.util.concurrent.locks.ReentrantLock$NonfairSync)
+	at java.util.concurrent.locks.LockSupport.park(java.base@21.0.6/LockSupport.java:221)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21.0.6/AbstractQueuedSynchronizer.java:754)
+	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(java.base@21.0.6/AbstractQueuedSynchronizer.java:990)
+	at java.util.concurrent.locks.ReentrantLock$Sync.lock(java.base@21.0.6/ReentrantLock.java:153)
+	at java.util.concurrent.locks.ReentrantLock.lock(java.base@21.0.6/ReentrantLock.java:322)
+	at org.grv.service.authpipeline.AccountLedger.transferNaive(AccountLedger.java:95)
+	at org.grv.DeadLockDemo.transferLoop(DeadLockDemo.java:23)
+	at org.grv.DeadLockDemo.lambda$main$1(DeadLockDemo.java:11)
+	at org.grv.DeadLockDemo$$Lambda/0x0000000501001438.run(Unknown Source)
+	at java.lang.Thread.runWith(java.base@21.0.6/Thread.java:1596)
+	at java.lang.Thread.run(java.base@21.0.6/Thread.java:1583)
+
+Found 1 deadlock.
+

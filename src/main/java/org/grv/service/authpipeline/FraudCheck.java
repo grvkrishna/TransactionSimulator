@@ -10,15 +10,17 @@ import java.util.concurrent.ThreadLocalRandom;
 public class FraudCheck implements Callable<CheckResult> {
 
     private final TransactionRecord txnRecord;
+    private static final double FORCED_SLOW_RATE = 0.02;
 
     public FraudCheck(TransactionRecord txnRecord) {
         this.txnRecord = txnRecord;
     }
 
     @Override
-    public CheckResult call() throws Exception {
+    public CheckResult call() {
         ThreadLocalRandom rnd = ThreadLocalRandom.current();
-        cpuTask(rnd.nextInt(5, 21));
+        int burnMs = rnd.nextDouble() < FORCED_SLOW_RATE ? 400 : rnd.nextInt(5, 21);
+        cpuTask(burnMs);
         int score =  txnRecord.amount() > 10_000 ? rnd.nextInt(40, 101) : rnd.nextInt(0, 91);
         if (score > 80){
            return new CheckResult("FraudCheck",false, DeclineReason.SCORE_DECLINE);

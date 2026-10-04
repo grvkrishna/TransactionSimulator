@@ -1,7 +1,6 @@
 package org.grv.service.authpipeline;
 
 import org.grv.config.TransientException;
-import org.grv.model.AccountBalanceStore;
 import org.grv.model.CheckResult;
 import org.grv.model.DeclineReason;
 import org.grv.model.TransactionRecord;
@@ -12,9 +11,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BalanceCheck implements Callable<CheckResult> {
 
     private final TransactionRecord txnRecord;
-    private final AccountBalanceStore balanceStore;
+    private final AccountLedger balanceStore;
 
-    public BalanceCheck(TransactionRecord txnRecord, AccountBalanceStore balanceStore) {
+    public BalanceCheck(TransactionRecord txnRecord, AccountLedger balanceStore) {
         this.txnRecord = txnRecord;
         this.balanceStore = balanceStore;
     }
