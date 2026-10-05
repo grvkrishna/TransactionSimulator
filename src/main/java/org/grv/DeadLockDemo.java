@@ -20,9 +20,9 @@ public class DeadLockDemo {
         String name = Thread.currentThread().getName();
         long iteration = 0;
         while (!Thread.currentThread().isInterrupted()) {
-            ledger.transferNaive(from, to, 1);
+            boolean val = ledger.transferWithTryLockRetry(from, to, 1);
             iteration++;
-            System.out.printf("%s transferred %d -> %d (iteration %d)%n", name, from, to, iteration);
+            System.out.printf("%s transferred %d -> %d (iteration %d)%n  return %n", name, from, to, iteration,val);
         }
     }
 }
