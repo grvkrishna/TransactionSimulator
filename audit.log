@@ -1,0 +1,41 @@
+AUDIT txn=1 account=11 amount=447.77 APPROVED
+AUDIT txn=2 account=19 amount=487.69 APPROVED
+AUDIT txn=3 account=16 amount=238.46 APPROVED
+AUDIT txn=4 account=1 amount=247.93 DECLINED reason=SCORE_DECLINE
+AUDIT txn=5 account=12 amount=484.46 DECLINED reason=SCORE_DECLINE
+AUDIT txn=6 account=9 amount=126.59 APPROVED
+AUDIT txn=7 account=15 amount=203.93 DECLINED reason=CHECK_ERROR
+AUDIT txn=8 account=2 amount=425.49 APPROVED
+AUDIT txn=9 account=5 amount=200.62 APPROVED
+AUDIT txn=10 account=12 amount=19665.09 APPROVED
+AUDIT txn=11 account=3 amount=11696.78 APPROVED
+AUDIT txn=12 account=6 amount=477.94 APPROVED
+AUDIT txn=13 account=4 amount=376.50 APPROVED
+AUDIT txn=14 account=17 amount=127.59 APPROVED
+AUDIT txn=15 account=16 amount=358.20 APPROVED
+AUDIT txn=16 account=11 amount=219.05 APPROVED
+AUDIT txn=17 account=19 amount=353.55 APPROVED
+AUDIT txn=18 account=7 amount=153.04 DECLINED reason=CHECK_ERROR
+AUDIT txn=19 account=3 amount=449.47 APPROVED
+AUDIT txn=20 account=13 amount=155.43 APPROVED
+AUDIT txn=21 account=4 amount=16625.74 DECLINED reason=FRAUD_TIMEOUT
+AUDIT txn=22 account=4 amount=25.10 APPROVED
+AUDIT txn=23 account=19 amount=123.47 APPROVED
+AUDIT txn=24 account=18 amount=460.98 DECLINED reason=SCORE_DECLINE
+AUDIT txn=25 account=15 amount=69.74 DECLINED reason=CHECK_ERROR
+AUDIT txn=26 account=3 amount=498.15 APPROVED
+AUDIT txn=27 account=19 amount=192.76 DECLINED reason=SCORE_DECLINE
+AUDIT txn=28 account=18 amount=212.46 APPROVED
+AUDIT txn=29 account=5 amount=73.86 APPROVED
+AUDIT txn=30 account=4 amount=363.77 APPROVED
+AUDIT txn=31 account=3 amount=131.15 APPROVED
+AUDIT txn=32 account=18 amount=10995.66 APPROVED
+AUDIT txn=33 account=15 amount=237.03 APPROVED
+AUDIT txn=34 account=11 amount=32.60 APPROVED
+AUDIT txn=35 account=3 amount=364.29 DECLINED reason=SCORE_DECLINE
+AUDIT txn=36 account=7 amount=362.68 DECLINED reason=CHECK_ERROR
+AUDIT txn=37 account=10 amount=13157.14 APPROVED
+AUDIT txn=38 account=10 amount=201.05 APPROVED
+AUDIT txn=39 account=20 amount=413.01 APPROVED
+AUDIT txn=40 account=13 amount=396.01 DECLINED reason=CHECK_ERROR
+AUDIT txn=41 account=12 amount=288.97 DECLINED reason=SCORE_DECLINE

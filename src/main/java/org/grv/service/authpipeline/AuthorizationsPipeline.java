@@ -1,5 +1,7 @@
 package org.grv.service.authpipeline;
 
+
+import org.grv.audit.AuditLogger;
 import org.grv.model.*;
 import org.grv.service.CallableToSupplierAdaptor;
 
@@ -12,14 +14,16 @@ public class AuthorizationsPipeline {
     private final DailySpendTracker spendTracker;
     private final ExecutorService cpuPool;
     private final ExecutorService ioPool;
+    private final AuditLogger auditLogger;
 
     private static final long FRAUD_TIMEOUT_MS = 300;
 
-    public AuthorizationsPipeline(AccountLedger balanceStore, DailySpendTracker spendTracker, ExecutorService cpuPool, ExecutorService ioPool) {
+    public AuthorizationsPipeline(AccountLedger balanceStore, DailySpendTracker spendTracker, ExecutorService cpuPool, ExecutorService ioPool, AuditLogger auditLogger) {
         this.balanceStore = balanceStore;
         this.spendTracker = spendTracker;
         this.cpuPool = cpuPool;
         this.ioPool = ioPool;
+        this.auditLogger = auditLogger;
     }
 
     public  CompletableFuture<Decision> authorize(TransactionRecord txnRecord) {
@@ -44,7 +48,29 @@ public class AuthorizationsPipeline {
                 .exceptionally(ex -> { //We are throwing any failure (e.g. TransientException from BalanceCheck) becomes a decline. No transaction is ever lost.
                     System.out.printf("txn=%d check failed: %s%n", txnRecord.id(), unwrap(ex));
                     return Decision.declined(txnRecord, DeclineReason.CHECK_ERROR, elapsedMs(start));
-                });
+                }).thenApply(this::updateAccount);
+    }
+
+    private Decision updateAccount(Decision decision){
+        TransactionRecord txn = decision.txnrcd();
+        if (decision.isApproved()){
+            if (balanceStore.debit(txn.accountId(),txn.amount())){
+                spendTracker.record(txn.cardId(),txn.amount());
+            }else {
+                System.out.printf("txn=%d approved but debit failed: balance changed since BalanceCheck%n", txn.id());
+                decision = Decision.declined(txn, DeclineReason.INSUFFICIENT_BALANCE, decision.latencyMs());
+            }
+        }
+        audit(decision);
+        return decision;
+    }
+
+    private void audit(Decision decision) {
+        TransactionRecord txn = decision.txnrcd();
+        String auditLog = String.format("AUDIT txn=%d account=%d amount=%.2f %s%s",
+                txn.id(), txn.accountId(), txn.amount(), decision.status(),
+                decision.isApproved() ? "" : " reason=" + decision.declineReason());
+        auditLogger.log(auditLog);
     }
 
     private static Decision decide(TransactionRecord txn, long start, CheckResult... results) {

@@ -10,12 +10,10 @@ import java.util.concurrent.CompletionException;
 public class TransactionProcessor implements Runnable{
 
     private final TransactionRecord txnRecord;
-    private final DailySpendTracker dailySpendTracker;
     private final AuthorizationsPipeline pipeline;
 
-    public TransactionProcessor(TransactionRecord txnRecord, DailySpendTracker dailySpendTracker, AuthorizationsPipeline pipeline) {
+    public TransactionProcessor(TransactionRecord txnRecord, AuthorizationsPipeline pipeline) {
         this.txnRecord = txnRecord;
-        this.dailySpendTracker = dailySpendTracker;
         this.pipeline = pipeline;
     }
 
@@ -48,9 +46,6 @@ public class TransactionProcessor implements Runnable{
         String thread = Thread.currentThread().getName();
         try {
             Decision decision = pipeline.authorize(txnRecord).join();
-            if (decision.isApproved()) {
-                dailySpendTracker.record(txnRecord.cardId(), txnRecord.amount());
-            }
             System.out.printf("%s txn=%d %s%s latency=%dms%n", thread, txnRecord.id(), decision.status(),
                     decision.isApproved() ? "" : " reason=" + decision.declineReason(), decision.latencyMs());
         } catch (CompletionException e) {
