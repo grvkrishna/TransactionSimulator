@@ -10,7 +10,7 @@ public class ThreadPoolConfig {
     private static final AtomicInteger threadCount = new AtomicInteger(1);
 
     private static final ThreadFactory threadFactory = r -> new Thread(r, "Consumer-pool-"+threadCount.getAndIncrement());
-    public static ExecutorService executorService = new ThreadPoolExecutor(3,
+    public static ThreadPoolExecutor executorService = new ThreadPoolExecutor(3,
             6,
             10,
             TimeUnit.SECONDS,
@@ -23,7 +23,7 @@ public class ThreadPoolConfig {
     private static final AtomicInteger cpuThreadCount = new AtomicInteger(1);
     private static final int CORES = Runtime.getRuntime().availableProcessors();
     private static final ThreadFactory cpuThreadFactory = r -> new Thread(r, "cpu-pool-"+threadCount.getAndIncrement());
-    public static ExecutorService cpuExecutorService = new ThreadPoolExecutor(CORES,
+    public static ThreadPoolExecutor cpuExecutorService = new ThreadPoolExecutor(CORES,
             CORES,
             0,
             TimeUnit.SECONDS,
@@ -34,7 +34,7 @@ public class ThreadPoolConfig {
     private static final AtomicInteger ioThreadCount = new AtomicInteger(1);
 
     private static final ThreadFactory ioThreadFactory = r -> new Thread(r, "IO-pool-"+threadCount.getAndIncrement());
-    public static ExecutorService ioExecutorService = new ThreadPoolExecutor(8,
+    public static ThreadPoolExecutor ioExecutorService = new ThreadPoolExecutor(8,
             18,
             10,
             TimeUnit.SECONDS,

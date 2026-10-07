@@ -45,4 +45,9 @@ public class BoundedBuffer<T> implements Buffer<T> {
             return arrayDeque.size();
         }
     }
+
+    @Override
+    public int capacity() {
+        return capacity;
+    }
 }

@@ -1,6 +1,7 @@
 package org.grv.service;
 
 
+import org.grv.matrics.Matrics;
 import org.grv.service.authpipeline.AccountLedger;
 import org.grv.model.Decision;
 import org.grv.model.TransactionRecord;
@@ -11,10 +12,11 @@ public class TransactionProcessor implements Runnable{
 
     private final TransactionRecord txnRecord;
     private final AuthorizationsPipeline pipeline;
-
-    public TransactionProcessor(TransactionRecord txnRecord, AuthorizationsPipeline pipeline) {
+    private final Matrics matrics;
+    public TransactionProcessor(TransactionRecord txnRecord, AuthorizationsPipeline pipeline, Matrics matrics) {
         this.txnRecord = txnRecord;
         this.pipeline = pipeline;
+        this.matrics = matrics;
     }
 
     @Override
@@ -50,6 +52,8 @@ public class TransactionProcessor implements Runnable{
                     decision.isApproved() ? "" : " reason=" + decision.declineReason(), decision.latencyMs());
         } catch (CompletionException e) {
             System.out.printf("%s txn=%d ERROR cause=%s%n", thread, txnRecord.id(), e.getCause());
+        }finally {
+            matrics.recordProcessed();
         }
     }
 }

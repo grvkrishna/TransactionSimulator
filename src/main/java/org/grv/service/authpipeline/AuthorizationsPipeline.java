@@ -2,6 +2,7 @@ package org.grv.service.authpipeline;
 
 
 import org.grv.audit.AuditLogger;
+import org.grv.matrics.Matrics;
 import org.grv.model.*;
 import org.grv.service.CallableToSupplierAdaptor;
 
@@ -15,15 +16,16 @@ public class AuthorizationsPipeline {
     private final ExecutorService cpuPool;
     private final ExecutorService ioPool;
     private final AuditLogger auditLogger;
-
+    private final Matrics matrics;
     private static final long FRAUD_TIMEOUT_MS = 300;
 
-    public AuthorizationsPipeline(AccountLedger balanceStore, DailySpendTracker spendTracker, ExecutorService cpuPool, ExecutorService ioPool, AuditLogger auditLogger) {
+    public AuthorizationsPipeline(AccountLedger balanceStore, DailySpendTracker spendTracker, ExecutorService cpuPool, ExecutorService ioPool, AuditLogger auditLogger, Matrics matrics) {
         this.balanceStore = balanceStore;
         this.spendTracker = spendTracker;
         this.cpuPool = cpuPool;
         this.ioPool = ioPool;
         this.auditLogger = auditLogger;
+        this.matrics = matrics;
     }
 
     public  CompletableFuture<Decision> authorize(TransactionRecord txnRecord) {
@@ -62,7 +64,18 @@ public class AuthorizationsPipeline {
             }
         }
         audit(decision);
+        recordMatrices(decision);
         return decision;
+    }
+
+
+    private  void recordMatrices(Decision decision){
+        if (decision.isApproved()){
+            matrics.recordApproved();
+        }else{
+            matrics.recordDeclineReason(decision.declineReason());
+            matrics.recordRejected();
+        }
     }
 
     private void audit(Decision decision) {

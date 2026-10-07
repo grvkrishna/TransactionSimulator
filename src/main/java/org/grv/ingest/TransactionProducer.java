@@ -1,5 +1,6 @@
 package org.grv.ingest;
 
+import org.grv.matrics.Matrics;
 import org.grv.service.TransactionRecordFactory;
 import org.grv.ingest.buffer.BoundedBuffer;
 import org.grv.model.TransactionRecord;
@@ -8,10 +9,9 @@ public class TransactionProducer implements Runnable{
 
     BoundedBuffer<TransactionRecord> transactionsBlockingQueue = null;
     int productionRate = 50;
-
     private int i =1;
 
-    public TransactionProducer(BoundedBuffer<TransactionRecord> queue,int productionRate){
+    public TransactionProducer(BoundedBuffer<TransactionRecord> queue, int productionRate){
         this.transactionsBlockingQueue = queue;
         this.productionRate = productionRate;
     }
