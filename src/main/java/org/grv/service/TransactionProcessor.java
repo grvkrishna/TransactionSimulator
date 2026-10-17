@@ -2,13 +2,16 @@ package org.grv.service;
 
 
 import org.grv.matrics.Matrics;
-import org.grv.service.authpipeline.AccountLedger;
 import org.grv.model.Decision;
 import org.grv.model.TransactionRecord;
 import org.grv.service.authpipeline.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.util.concurrent.CompletionException;
 public class TransactionProcessor implements Runnable{
+    private static final Logger log = LoggerFactory.getLogger(TransactionProcessor.class);
 
     private final TransactionRecord txnRecord;
     private final AuthorizationsPipeline pipeline;
@@ -45,15 +48,17 @@ public class TransactionProcessor implements Runnable{
 //                System.out.println("Transaction :" + txnRecord.id() + " : APPROVED");
 //                dailySpendTracker.record(txnRecord.cardId(),txnRecord.amount());
 //            }
-        String thread = Thread.currentThread().getName();
+//        String thread = Thread.currentThread().getName();
+        MDC.put("txnId", String.valueOf(txnRecord.id()));
         try {
             Decision decision = pipeline.authorize(txnRecord).join();
-            System.out.printf("%s txn=%d %s%s latency=%dms%n", thread, txnRecord.id(), decision.status(),
+            log.info("txn={} {}{} latency={}ms", txnRecord.id(), decision.status(),
                     decision.isApproved() ? "" : " reason=" + decision.declineReason(), decision.latencyMs());
-        } catch (CompletionException e) {
-            System.out.printf("%s txn=%d ERROR cause=%s%n", thread, txnRecord.id(), e.getCause());
-        }finally {
+        }  catch (CompletionException e) {
+            log.warn("txn={} failed cause={}", txnRecord.id(), e.getCause().toString());
+        } finally {
             matrics.recordProcessed();
+            MDC.remove("txnId");
         }
     }
 }

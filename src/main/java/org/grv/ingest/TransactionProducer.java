@@ -39,4 +39,8 @@ public class TransactionProducer implements Runnable{
     private void sleep(Integer ms) throws InterruptedException {
         Thread.sleep(ms);
     }
+
+    public int produced() {
+        return i - 1;
+    }
 }

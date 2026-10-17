@@ -1,6 +1,7 @@
 package org.grv.matrics;
 
 
+import org.grv.decorator.TimingExecutor;
 import org.grv.ingest.buffer.Buffer;
 import org.grv.issuer.IssuerBankClient;
 import org.grv.model.DeclineReason;
@@ -20,14 +21,18 @@ public class MatrixReporter implements Runnable{
     private long lastProcessed = 0;
     private long lastNanos = System.nanoTime();
     private final IssuerBankClient issuerBankClient;
+    private final TimingExecutor cpuTimed;
+    private final TimingExecutor ioTimed;
 
-    public MatrixReporter(Matrics matrics, Buffer<?> buffer, ThreadPoolExecutor consumerPool, ThreadPoolExecutor cpuPool, ThreadPoolExecutor ioPool,IssuerBankClient issuerBankClient) {
+    public MatrixReporter(Matrics matrics, Buffer<?> buffer, ThreadPoolExecutor consumerPool, ThreadPoolExecutor cpuPool, ThreadPoolExecutor ioPool, IssuerBankClient issuerBankClient, TimingExecutor cpuTimed, TimingExecutor ioTimed) {
         this.matrics = matrics;
         this.buffer = buffer;
         this.consumerPool = consumerPool;
         this.cpuPool = cpuPool;
         this.ioPool = ioPool;
         this.issuerBankClient = issuerBankClient;
+        this.cpuTimed = cpuTimed;
+        this.ioTimed = ioTimed;
     }
 
 
@@ -48,15 +53,23 @@ public class MatrixReporter implements Runnable{
         lastProcessed = processed;
         lastNanos = now;
 
-        System.out.printf("[metrics] received=%d approved=%d declined=%d %s inFlight=%d rejected=%d retried=%d tps=%d  processedTps=%d%n" ,
-                received, approved, declined, declineBreakdown(), inFlight, rejected, matrics.getRetried(), tps,tpsProcessed);
+        System.out.printf("[metrics] received=%d approved=%d declined=%d %s inFlight=%d rejected=%d retried=%d tps=%d processedTps=%d settled=%d%n",
+                received, approved, declined, declineBreakdown(), inFlight, rejected, matrics.getRetried(), tps, tpsProcessed,matrics.getSettled());
 
 
-        System.out.printf("[threads] buffer=%d/%d | %s | %s | %s  | issuer inUse=%d/%d waiting=%d max=%d%n",
+        System.out.printf("[threads] buffer=%d/%d | %s | %s | %s | issuer inUse=%d/%d waiting=%d max=%d%n",
                 buffer.size(), buffer.capacity(),
                 poolStats("consumer", consumerPool),
                 poolStats("cpu", cpuPool),
-                poolStats("io", ioPool),issuerBankClient.inUse(),issuerBankClient.capacity(),issuerBankClient.waiting(),issuerBankClient.maxInFlight());
+                poolStats("io", ioPool),
+                issuerBankClient.inUse(), issuerBankClient.capacity(), issuerBankClient.waiting(), issuerBankClient.maxInFlight());
+
+        System.out.printf("[latency] %s | %s%n", timing(cpuTimed), timing(ioTimed));
+
+    }
+
+    private static String timing(TimingExecutor t) {
+        return String.format("%s wait=%.1fms run=%.1fms", t.name(), t.avgQueueMs(), t.avgRunMs());
     }
 
     private String declineBreakdown() {
@@ -78,6 +91,10 @@ public class MatrixReporter implements Runnable{
 
     @Override
     public void run() {
-        printMatrices();
+        try {
+            printMatrices();
+        } catch (RuntimeException e) {
+            System.err.println("metrics reporter failed: " + e);
+        }
     }
 }

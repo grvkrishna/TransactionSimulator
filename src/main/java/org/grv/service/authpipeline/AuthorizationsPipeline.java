@@ -2,27 +2,35 @@ package org.grv.service.authpipeline;
 
 
 import org.grv.audit.AuditLogger;
+import org.grv.decorator.RetryingCallable;
 import org.grv.issuer.IssuerBankClient;
 import org.grv.matrics.Matrics;
 import org.grv.model.*;
 import org.grv.service.CallableToSupplierAdaptor;
+import org.grv.service.settlement.SettlementService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.*;
 
 
 public class AuthorizationsPipeline {
 
+    private static final Logger log = LoggerFactory.getLogger(AuthorizationsPipeline.class);
+
     private final AccountLedger balanceStore;
     private final DailySpendTracker spendTracker;
-    private final ExecutorService cpuPool;
-    private final ExecutorService ioPool;
+    private final Executor cpuPool;
+    private final Executor ioPool;
     private final AuditLogger auditLogger;
     private final Matrics matrics;
     private static final long FRAUD_TIMEOUT_MS = 300;
     private static final long ISSUER_THRESHOLD = 10000;
     private final IssuerBankClient issuerBankClient;
 
-    public AuthorizationsPipeline(AccountLedger balanceStore, DailySpendTracker spendTracker, ExecutorService cpuPool, ExecutorService ioPool, AuditLogger auditLogger, Matrics matrics,IssuerBankClient issuerBankClient) {
+    private final SettlementService settlementService;
+
+    public AuthorizationsPipeline(AccountLedger balanceStore, DailySpendTracker spendTracker, Executor cpuPool, Executor ioPool, AuditLogger auditLogger, Matrics matrics, IssuerBankClient issuerBankClient, SettlementService settlementService) {
         this.balanceStore = balanceStore;
         this.spendTracker = spendTracker;
         this.cpuPool = cpuPool;
@@ -30,6 +38,7 @@ public class AuthorizationsPipeline {
         this.auditLogger = auditLogger;
         this.matrics = matrics;
         this.issuerBankClient = issuerBankClient;
+        this.settlementService = settlementService;
     }
 
     public  CompletableFuture<Decision> authorize(TransactionRecord txnRecord) {
@@ -45,7 +54,7 @@ public class AuthorizationsPipeline {
                     throw new CompletionException(unwrap(ex));
                 });
 
-        CompletableFuture<CheckResult> balanceFuture = CompletableFuture.supplyAsync(CallableToSupplierAdaptor.adapt(new BalanceCheck(txnRecord,balanceStore)), ioPool);
+        CompletableFuture<CheckResult> balanceFuture = CompletableFuture.supplyAsync(CallableToSupplierAdaptor.adapt(new RetryingCallable<>(new BalanceCheck(txnRecord,balanceStore),3,10,matrics) ), ioPool);
 
         CompletableFuture<CheckResult> limitFuture = CompletableFuture.supplyAsync(CallableToSupplierAdaptor.adapt(new LimitCheck(txnRecord,spendTracker)),ioPool);
 
@@ -58,7 +67,7 @@ public class AuthorizationsPipeline {
                     return   CompletableFuture.completedFuture(v);
                 })
                 .exceptionally(ex -> { //We are throwing any failure (e.g. TransientException from BalanceCheck) becomes a decline. No transaction is ever lost.
-                    System.out.printf("txn=%d check failed: %s%n", txnRecord.id(), unwrap(ex));
+                    log.warn("txn={} check failed: {}", txnRecord.id(), unwrap(ex).toString());
                     return Decision.declined(txnRecord, DeclineReason.CHECK_ERROR, elapsedMs(start));
                 }).thenApply(this::updateAccount);
     }
@@ -68,8 +77,9 @@ public class AuthorizationsPipeline {
         if (decision.isApproved()){
             if (balanceStore.debit(txn.accountId(),txn.amount())){
                 spendTracker.record(txn.cardId(),txn.amount());
+                settlementService.record(txn);
             }else {
-                System.out.printf("txn=%d approved but debit failed: balance changed since BalanceCheck%n", txn.id());
+                log.warn("txn={} approved but debit failed: balance changed since BalanceCheck", txn.id());
                 decision = Decision.declined(txn, DeclineReason.INSUFFICIENT_BALANCE, decision.latencyMs());
             }
         }

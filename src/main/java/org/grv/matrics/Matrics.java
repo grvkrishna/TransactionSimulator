@@ -21,6 +21,8 @@ public class Matrics {
     private final LongAdder processed= new
             LongAdder();
 
+    private final LongAdder settled = new LongAdder();
+
     private final EnumMap<DeclineReason, LongAdder> declineReasonCounter =  new EnumMap<>(DeclineReason.class);
 
 
@@ -94,4 +96,7 @@ public class Matrics {
 
         return total;
     }
+
+    public void recordSettled(long count) { settled.add(count); }
+    public long getSettled() { return settled.sum(); }
 }
