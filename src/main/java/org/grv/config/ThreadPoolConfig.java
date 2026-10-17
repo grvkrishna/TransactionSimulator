@@ -16,8 +16,6 @@ public class ThreadPoolConfig {
             TimeUnit.SECONDS,
             processTask,threadFactory,new  ThreadPoolExecutor.CallerRunsPolicy());
 
-    public static ExecutorService executorServiceAuthPipeline = Executors.newFixedThreadPool(6);
-
     static LinkedBlockingQueue<Runnable> processCpu = new LinkedBlockingQueue<>(100);
 
     private static final AtomicInteger cpuThreadCount = new AtomicInteger(1);
