@@ -6,7 +6,8 @@ public enum DeclineReason {
     INSUFFICIENT_BALANCE("Insufficient balance"),
     LIMIT_DECLINE("Daily card limit exceeded"),
     FRAUD_TIMEOUT("Fraud check took longer than 300 ms"),
-    CHECK_ERROR("A check failed with an error");
+    CHECK_ERROR("A check failed with an error"),
+    ISSUER_UNAVAILABLE("Issuer Bank Declined");
 
     private final String description;
 

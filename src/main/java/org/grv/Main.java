@@ -4,6 +4,7 @@ package org.grv;
 import org.grv.audit.AuditLogger;
 import org.grv.config.ThreadPoolConfig;
 import org.grv.ingest.TransactionSimulator;
+import org.grv.issuer.IssuerBankClient;
 import org.grv.matrics.Matrics;
 import org.grv.matrics.MatrixReporter;
 import org.grv.service.authpipeline.AccountLedger;
@@ -25,12 +26,13 @@ public class Main {
 
         AccountLedger balanceStore = new AccountLedger(20, 50_000);
         DailySpendTracker spendTracker = new DailySpendTracker();
+        IssuerBankClient issuerBankClient = new IssuerBankClient();
         AuthorizationsPipeline pipeline = new AuthorizationsPipeline(balanceStore, spendTracker,
-                ThreadPoolConfig.cpuExecutorService, ThreadPoolConfig.ioExecutorService,auditLogger,matrics);
+                ThreadPoolConfig.cpuExecutorService, ThreadPoolConfig.ioExecutorService,auditLogger,matrics,issuerBankClient);
         TransactionSimulator tf = new TransactionSimulator(pipeline,matrics);
 
         MatrixReporter reporter = new MatrixReporter(matrics, tf.getBuffer(),
-                ThreadPoolConfig.executorService, ThreadPoolConfig.cpuExecutorService, ThreadPoolConfig.ioExecutorService);
+                ThreadPoolConfig.executorService, ThreadPoolConfig.cpuExecutorService, ThreadPoolConfig.ioExecutorService,issuerBankClient);
 
         ScheduledExecutorService metricsScheduler =
                 Executors.newSingleThreadScheduledExecutor(r -> new Thread(r, "metrics-reporter"));

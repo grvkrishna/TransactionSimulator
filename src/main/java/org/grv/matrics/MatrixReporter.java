@@ -1,8 +1,8 @@
 package org.grv.matrics;
 
-import org.grv.config.ThreadPoolConfig;
-import org.grv.ingest.TransactionSimulator;
+
 import org.grv.ingest.buffer.Buffer;
+import org.grv.issuer.IssuerBankClient;
 import org.grv.model.DeclineReason;
 
 import java.util.StringJoiner;
@@ -19,13 +19,15 @@ public class MatrixReporter implements Runnable{
     private long lastReceived = 0;
     private long lastProcessed = 0;
     private long lastNanos = System.nanoTime();
+    private final IssuerBankClient issuerBankClient;
 
-    public MatrixReporter(Matrics matrics, Buffer<?> buffer, ThreadPoolExecutor consumerPool, ThreadPoolExecutor cpuPool, ThreadPoolExecutor ioPool) {
+    public MatrixReporter(Matrics matrics, Buffer<?> buffer, ThreadPoolExecutor consumerPool, ThreadPoolExecutor cpuPool, ThreadPoolExecutor ioPool,IssuerBankClient issuerBankClient) {
         this.matrics = matrics;
         this.buffer = buffer;
         this.consumerPool = consumerPool;
         this.cpuPool = cpuPool;
         this.ioPool = ioPool;
+        this.issuerBankClient = issuerBankClient;
     }
 
 
@@ -50,11 +52,11 @@ public class MatrixReporter implements Runnable{
                 received, approved, declined, declineBreakdown(), inFlight, rejected, matrics.getRetried(), tps,tpsProcessed);
 
 
-        System.out.printf("[threads] buffer=%d/%d | %s | %s | %s%n",
+        System.out.printf("[threads] buffer=%d/%d | %s | %s | %s  | issuer inUse=%d/%d waiting=%d max=%d%n",
                 buffer.size(), buffer.capacity(),
                 poolStats("consumer", consumerPool),
                 poolStats("cpu", cpuPool),
-                poolStats("io", ioPool));
+                poolStats("io", ioPool),issuerBankClient.inUse(),issuerBankClient.capacity(),issuerBankClient.waiting(),issuerBankClient.maxInFlight());
     }
 
     private String declineBreakdown() {

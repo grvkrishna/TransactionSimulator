@@ -2,6 +2,7 @@ package org.grv.service.authpipeline;
 
 
 import org.grv.audit.AuditLogger;
+import org.grv.issuer.IssuerBankClient;
 import org.grv.matrics.Matrics;
 import org.grv.model.*;
 import org.grv.service.CallableToSupplierAdaptor;
@@ -18,14 +19,17 @@ public class AuthorizationsPipeline {
     private final AuditLogger auditLogger;
     private final Matrics matrics;
     private static final long FRAUD_TIMEOUT_MS = 300;
+    private static final long ISSUER_THRESHOLD = 10000;
+    private final IssuerBankClient issuerBankClient;
 
-    public AuthorizationsPipeline(AccountLedger balanceStore, DailySpendTracker spendTracker, ExecutorService cpuPool, ExecutorService ioPool, AuditLogger auditLogger, Matrics matrics) {
+    public AuthorizationsPipeline(AccountLedger balanceStore, DailySpendTracker spendTracker, ExecutorService cpuPool, ExecutorService ioPool, AuditLogger auditLogger, Matrics matrics,IssuerBankClient issuerBankClient) {
         this.balanceStore = balanceStore;
         this.spendTracker = spendTracker;
         this.cpuPool = cpuPool;
         this.ioPool = ioPool;
         this.auditLogger = auditLogger;
         this.matrics = matrics;
+        this.issuerBankClient = issuerBankClient;
     }
 
     public  CompletableFuture<Decision> authorize(TransactionRecord txnRecord) {
@@ -47,6 +51,12 @@ public class AuthorizationsPipeline {
 
         return CompletableFuture.allOf(fraudFuture, balanceFuture, limitFuture)
                 .thenApply(v -> decide(txnRecord, start, fraudFuture.join(), balanceFuture.join(), limitFuture.join()))
+                .thenCompose( v -> {
+                    if (v.txnrcd().amount() > ISSUER_THRESHOLD && v.isApproved()) {
+                        return   CompletableFuture.supplyAsync(() -> issuerBankClient.issuerAuthorizations(v),ioPool);
+                    }
+                    return   CompletableFuture.completedFuture(v);
+                })
                 .exceptionally(ex -> { //We are throwing any failure (e.g. TransientException from BalanceCheck) becomes a decline. No transaction is ever lost.
                     System.out.printf("txn=%d check failed: %s%n", txnRecord.id(), unwrap(ex));
                     return Decision.declined(txnRecord, DeclineReason.CHECK_ERROR, elapsedMs(start));
